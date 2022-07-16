@@ -5,3 +5,9 @@ This python script reads "Finance_ver2.tsv" file with information on spendings b
 - Show total spendings per month (in a specified year);
 - Show spendings per month over a specified period; 
 
+## GUI_2.py
+
+This is the main script that executes the GUI. You can convert it into an executable `.exe` file by running the following command in the Python terminal:
+```py
+pyinstaller -w GUI_2.py
+```
