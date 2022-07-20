@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
 from tkinter.filedialog import askopenfile
+from tkinter.filedialog import askopenfilename
 
 
 ############################################################################
@@ -22,12 +23,15 @@ def dataset_process_basic(file_name):
 	"""
 	Dataproc step1: Import and clean the data
 	"""
-	try:
-		currDir = os.path.dirname(__file__)
-		df = pd.read_csv(f'{currDir}/{file_name}', sep='\t')
-		print(f"{currDir}/{file_name}")
-	except NameError:
-		df = pd.read_csv('{file_name}', sep='\t')
+	# try:
+	# 	currDir = os.path.dirname(__file__)
+	# 	df = pd.read_csv(f'{currDir}/{file_name}', sep='\t')
+	# 	print(f"{currDir}/{file_name}")
+	# except NameError:
+	# 	df = pd.read_csv('{file_name}', sep='\t')
+	df = pd.read_csv(file_name, sep='\t')
+	# print(f"{currDir}")
+	# print(f"{file_name}")
 	dfHeader = df[df['Date'] == '#'].copy()
 	dfMain   = df[df['Date'] != '#'].copy()
 	dfMain['Date'] = pd.to_datetime(dfMain['Date'], format='%d.%m.%Y')
@@ -68,11 +72,11 @@ def add_extra_dates(dfMain):
 ### Data summarisation and visualisation
 ############################################################################
 
-def function1():
+def function1(pathed_filename):
 	"""
 	Print unique counts of spending categories
 	"""
-	dfHeader, df2 = dataset_process_basic('Finance_record.tsv')
+	dfHeader, df2 = dataset_process_basic(pathed_filename)
 	array = df2['Category'].unique()
 	textOutput = ''
 	textOutput += f"Spending categories:\n"
@@ -89,13 +93,11 @@ def plot1():
 	graph1 = sns.regplot(x, x*2)
 	plt.show()
 
-
-# Plot2 - plot totals per month (all time)
-def plot2():
+def plot2(pathed_filename):
 	"""
 	Print totals per month (all-time)
 	"""
-	dfHeader, dfMain = dataset_process_basic('Finance_record.tsv')
+	dfHeader, dfMain = dataset_process_basic(pathed_filename)
 	currency = 'MXN'; 
 	dfMain = convert(dfMain, currency)
 	dfMain2 = dfMain.groupby('Date')[f'Converted_{currency}'].sum().to_frame().reset_index()
@@ -108,8 +110,8 @@ def plot2():
 	sns.set_context('poster')
 	plt.show()
 
-def plot2_ver2():
-	dfHeader, dfMain = dataset_process_basic('Finance_record.tsv')
+def plot2_ver2(pathed_filename):
+	dfHeader, dfMain = dataset_process_basic(pathed_filename)
 	currency = 'MXN'; 
 	dfMain = convert(dfMain, currency)
 	dfMain2 = dfMain.groupby('Date')[f'Converted_{currency}'].sum().to_frame().reset_index()
@@ -124,9 +126,8 @@ def plot2_ver2():
 	sns.set_context('poster')
 	plt.show()
 
-
-def plot3(year):
-	dfHeader, dfMain = dataset_process_basic('Finance_record.tsv')
+def plot3(pathed_filename, year):
+	dfHeader, dfMain = dataset_process_basic(pathed_filename)
 	currency = 'MXN'; 
 	dfMain = convert(dfMain, currency)
 	# Add extra time information
@@ -135,13 +136,6 @@ def plot3(year):
 	dfMain2
 	df3 = dfMain2[dfMain2['YYYY'] == year]
 	df3['MM'] = dfMain2['Date'].dt.strftime('%b')
-	# df3 = df2[ (df2['Date'] < endDate) & (df2['Date'] > startDate) ]
-	# Check that between the two dates the distance is less than 6 months
-	# startDateDT = datetime.datetime(int(startDate.split('-')[0]), int(startDate.split('-')[1]), int(startDate.split('-')[2]))
-	# endDateDT = datetime.datetime(int(endDate.split('-')[0]), int(endDate.split('-')[1]), int(endDate.split('-')[2]))
-	# delta = endDateDT - startDateDT
-	# deltaDays = (delta.total_seconds() /(3600*24))
-	# assert deltaDays < 181, 'the number is higher than 6 months!'
 	# Plot the figure
 	plt.figure(figsize=(8, 6))
 	sns.barplot(x='MM', y=f'Converted_{currency}', data=df3, color='grey')
@@ -152,53 +146,18 @@ def plot3(year):
 	plt.show()
 	# return df3
 
-# def plot4(startDate, endDate):
-# 	# plot4('2022-01-01', '2022-05-29')
-# 	dfHeader, dfMain = dataset_process_basic()
-# 	currency = 'MXN'; 
-# 	dfMain = convert(dfMain, currency)
-# 	# Add extra time information
-# 	dfMain2 = dfMain.groupby('Date')[f'Converted_{currency}'].sum().to_frame().reset_index()
-# 	dfMain2 = add_extra_dates(dfMain2)
-# 	dfMain2
-# 	df3 = dfMain2[ (dfMain2['Date'] <= endDate) & (dfMain2['Date'] >= startDate) ]
-# 	# Check that between the two dates the distance is less than 6 months
-# 	startDateDT = datetime.datetime(int(startDate.split('-')[0]), int(startDate.split('-')[1]), int(startDate.split('-')[2]))
-# 	endDateDT = datetime.datetime(int(endDate.split('-')[0]), int(endDate.split('-')[1]), int(endDate.split('-')[2]))
-# 	delta = endDateDT - startDateDT
-# 	deltaDays = (delta.total_seconds() /(3600*24))
-# 	assert deltaDays < 181, 'the number is higher than 6 months!'
-# 	# Plot the figure
-# 	plt.figure(figsize=(10, 8))
-# 	sns.barplot(x='DDMMYY', y=f'Converted_{currency}', data=df3, hue='YYYY', dodge=False)
-# 	plt.xlabel('Date')
-# 	plt.legend([], [], frameon=False)
-# 	plt.show()
-# 	# return df3
-
-def plot4(startDate, endDate):
+def plot4(pathed_filename, startDate, endDate):
 	"""
 	startDate = '2022.03'
 	endDate = '2022.05'
 	"""
-	dfHeader, dfMain = dataset_process_basic('Finance_record.tsv')
+	dfHeader, dfMain = dataset_process_basic(pathed_filename)
 	currency = 'MXN'; 
 	dfMain = convert(dfMain, currency)
 	# Add extra time information
 	dfMain2 = dfMain.groupby('Date')[f'Converted_{currency}'].sum().to_frame().reset_index()
 	dfMain2 = add_extra_dates(dfMain2)
 	df3 = dfMain2[ (dfMain2['Date'] >= startDate) & (dfMain2['Date'] <= endDate) ]
-	
-	# df3 = dfMain2[ (dfMain2['Date'] <= endDate) & (dfMain2['Date'] >= startDate) ]
-	# Check that between the two dates the distance is less than 6 months
-	# startDateDT = datetime.datetime(int(startDate.split('-')[0]), int(startDate.split('-')[1]), int(startDate.split('-')[2]))
-	# endDateDT = datetime.datetime(int(endDate.split('-')[0]), int(endDate.split('-')[1]), int(endDate.split('-')[2]))
-	# delta = endDateDT - startDateDT
-	# deltaDays = (delta.total_seconds() /(3600*24))
-	# if deltaDays >= 181:
-	# 	return False
-	# elif deltaDays < 181:
-	# assert deltaDays < 181, 'the number is higher than 6 months!'
 	# Plot the figure
 	plt.figure(figsize=(10, 8))
 	sns.barplot(x='DDMMYY', y=f'Converted_{currency}', data=df3, hue='YYYY', dodge=False)
@@ -210,7 +169,7 @@ def plot4(startDate, endDate):
 
 window = Tk()
 window.title('Finance manager ver 3.0.0')
-window.geometry('1140x900')
+# window.geometry('1140x900')
 
 # Aesthetics
 bg1 = 'lightgrey'
@@ -223,17 +182,10 @@ fontTitle='Helvetica 15'
 fontBody='Helvetica 12'
 pad = [10, 10]
 button_pad = [5, 5]
-
 fontFrameTitle = 'Helvetica 10'
 
-
-# Canvas
-# canvas = Canvas(window, width=900, height=800)
-# canvas.grid(columnspan=100, rowspan=100) # initialise canvas object
-
-
 # Logo
-logo = Image.open('dollar-sign.jpg')
+logo = Image.open('dollar_house.png')
 logo = logo.resize((300, 205), Image.ANTIALIAS)
 logo = ImageTk.PhotoImage(logo)
 logo_label = Label(image=logo)
@@ -244,127 +196,79 @@ logo_label.grid(columnspan=5, column=0, row=0, pady=30)
 
 ## Description
 frame1 = Label(window, text="Welcome to the Finance Manager!\nHere, you can visualise your spendings in nice graphs!", font=fontTitle)
-frame1.grid(columnspan=5, column=0, row=1)
+frame1.grid(columnspan=5, column=0, row=1, padx=30)
 
-Label(window, text="").grid(column=0, row=2)
+## Select File Prompt
+def open_file():
+	browse_text.set('loading...')
+	file = askopenfilename(filetype=[("TSV file", "*.tsv")])
+	if file:
+		window.geometry('1070x900')
+		Label(window, text=f"You have selected: {file}").grid(columnspan=5, column=0, row=4, pady=30)
+		print(file)
+		# Got the filename, now can put it to all the functions
+		browse_text.set('Select File')
+		### 
+		# FRAME 1
+		frame1 = LabelFrame(window, text="Information", padx=50, pady=50, font=fontFrameTitle)
+		frame1.grid(column=0, row=5, padx=50)
+		## Print unique spending categories
+		def printCats():
+			a = function1(file)
+			global categories_list 
+			categories_list = Text(frame1, height=10, width=btnWidth, padx=15, pady=15, font=fontBody)
+			categories_list.insert(1.0, a)
+			# Center the text
+			categories_list.tag_configure('left', justify='left')
+			categories_list.tag_add('left', 1.0, 'end')
+			categories_list.grid(column=0, row=2)
+		# Label(frame1, text="Press this to print \nunique spending categories").grid(row=2, column=0)
+		btn1_1 = Button(frame1, text="Print unique spending categories", command=printCats, font=fontBody, bg=bgButton, width=btnWidth)
+		btn1_1.grid(row=1, column=0, padx=button_pad[0], pady=button_pad[1])
 
-# FRAME 1
-frame1 = LabelFrame(window, text="Information", padx=50, pady=50, font=fontFrameTitle)
-frame1.grid(row=3, column=0, padx=50)
-## Exit button
-exit_btn = Button(frame1, text='EXIT', command=window.quit, font=fontBody, bg='#ff6459', width=btnWidth)
-exit_btn.grid(column=0, row=0, padx=button_pad[0], pady=button_pad[1])
-## Print unique spending categories
-def printCats():
-	a = function1()
-	global categories_list 
-	categories_list = Text(frame1, height=10, width=btnWidth, padx=15, pady=15, font=fontBody)
-	categories_list.insert(1.0, a)
-	# Center the text
-	categories_list.tag_configure('left', justify='left')
-	categories_list.tag_add('left', 1.0, 'end')
-	categories_list.grid(column=0, row=2)
-# Label(frame1, text="Press this to print \nunique spending categories").grid(row=2, column=0)
-btn1_1 = Button(frame1, text="Print unique spending categories", command=printCats, font=fontBody, bg=bgButton, width=btnWidth)
-btn1_1.grid(row=1, column=0, padx=button_pad[0], pady=button_pad[1])
+		# FRAME 2
+		frame2 = LabelFrame(window, text="Graphs", padx=50, pady=50, font=fontFrameTitle)
+		frame2.grid(column=1, row=5)
 
-# FRAME 2
-frame2 = LabelFrame(window, text="Graphs", padx=50, pady=50, font=fontFrameTitle)
-frame2.grid(row=3, column=1)
+		## Print totals per month (all time)
+		Label(frame2, text='Print totals per month (all time)', font='Helvetica 15 bold').grid(columnspan=4, column=0, row=0, pady=button_pad[1])
+		btn3_1 = Button(frame2, text='RUN', command=lambda: plot2_ver2(file), font=fontBody, bg=bgButton, width=btnWidth)
+		# btn3_1.grid(column = 0, row=1, padx=button_pad[0], pady=button_pad[1])
+		btn3_1.grid(columnspan=4, column=0, row=1)
+		## Print totals per month (specified year)
+		Label(frame2, text='Print totals per month (specified year)', font='Helvetica 15 bold').grid(columnspan=4, column=0, row=2, pady=button_pad[1])
+		e1 = Entry(frame2, width=btnWidth)
+		e1.grid(columnspan=4, column=0, row=3, padx=button_pad[0], pady=button_pad[1])
+		btn3_2 = Button(frame2, text='RUN', command=lambda: plot3(file, e1.get()), font=fontBody, bg=bgButton); 
+		btn3_2.grid(column = 3, row=3, padx=button_pad[0], pady=button_pad[1])
+		## Print totals per month (specified range)
+		Label(frame2, text='Print totals per month in the specified range', font='Helvetica 15 bold').grid(columnspan=4, column=0, row=4, pady=button_pad[1])
+		Label(frame2, text='Example: 2021.09 - 2021.12').grid(columnspan=4, column=0, row=5)
+		x1=50; y1=220
+		e2 = Entry(frame2); e2.place(x=x1, y=y1)
+		Label(frame2, text='-').place(x=x1+130, y=y1)
+		e3 = Entry(frame2); e3.place(x=x1+150, y=y1)
+		# Label(frame2, text='-').grid(column=1, row=6)
+		# e3 = Entry(frame2); e3.grid( column=1, row=6)
+		btn3_3 = Button(frame2, text='RUN', command=lambda: plot4(file, e2.get(), e3.get()), font=fontBody, bg=bgButton)
+		# btn3_3.grid(column=3, row=4, padx=button_pad[0], pady=button_pad[1])
+		# btn3_3.grid(column=3, row=6)
+		btn3_3.place(x=x1+290, y=y1-6)
 
-## Print totals per month (all time)
-Label(frame2, text='Print totals per month (all time)', font='Helvetica 15 bold').grid(column=0, row=0)
-btn3_1 = Button(frame2, text='RUN', command=plot2_ver2, font=fontBody, bg=bgButton, width=btnWidth)
-btn3_1.grid(column = 0, row=1, padx=button_pad[0], pady=button_pad[1])
-## Print totals per month (specified year)
-Label(frame2, text='Print totals per month (specified year)', font='Helvetica 15 bold').grid(column=0, row=2)
-e1 = Entry(frame2, width=btnWidth)
-e1.grid(column=0, row=3, padx=button_pad[0], pady=button_pad[1])
-btn3_2 = Button(frame2, text='RUN', command=lambda: plot3(e1.get()), font=fontBody, bg=bgButton); 
-btn3_2.grid(column = 1, row=3, padx=button_pad[0], pady=button_pad[1])
-
-## Print totals per month (specified range)
-Label(frame2, text='Print totals per month in the specified range', font='Helvetica 15 bold').grid(column=0, row=4)
-Label(frame2, text='Example: 2021.09 - 2021.12').grid(column=0, row=5)
-# e2 = Entry(frame2); e2.grid( column=0, row=6)
-e2 = Entry(frame2); e2.place(x=100, y=200)
-Label(frame2, text='-').place(x=230, y=200)
-e3 = Entry(frame2); e3.place(x=250, y=200)
-
-# Label(frame2, text='-').grid(column=1, row=6)
-# e3 = Entry(frame2); e3.grid( column=1, row=6)
-btn3_3 = Button(frame2, text='RUN', command=lambda: plot4(e2.get(), e3.get()), font=fontBody, bg=bgButton)
-# btn3_3.grid(column=3, row=4, padx=button_pad[0], pady=button_pad[1])
-# btn3_3.grid(column=3, row=6)
-btn3_3.place(x=410, y=200)
-
-
-
-# Label(frame2, text='Example: 2021', font=fontBody, bg=bg1).grid(column=5, row=3)
-# ## Print totals per month in the specified range
-# Label(frame2, text='Example: \n2021.09', font=fontBody, bg=bg1).grid(column=5, row=4)
-# Label(frame2, text='Example: \n2021.12', font=fontBody, bg=bg1).grid(column=5, row=5)
-# Label(window, text='From', font=fontBody, bg=bg1).grid(row=5, column=1)
-# Label(window, text='-', font=fontBody, bg=bg1).grid(row=5, column=2)
-# Label(window, text='To', font=fontBody, bg=bg1).grid(row=5, column=2)
-# e2 = Entry(frame2); e2.grid( column=4, row=4)
-# e3 = Entry(frame2); e3.grid( column=4, row=5)
-# btn3_3 = Button(frame2, text='Print totals per month \nin the specified range', command=lambda: plot4(e2.get(), e3.get()), font=fontBody, bg=bgButton, width=btnWidth)
-# # btn3_3.grid(column=3, row=4, padx=button_pad[0], pady=button_pad[1])
-# btn3_3.place(x=320, y=350)
+# EXIT button
+exit_btn = Button(window, text='EXIT', command=window.quit, font=fontBody, bg='#ff6459', width=btnWidth)
+exit_btn.grid(columnspan=5, column=0, row=2, padx=button_pad[0], pady=button_pad[1])
 
 
-
+# SELECT FILE button
+browse_text = StringVar()
+select_file_btn = Button(window, textvariable=browse_text, command=lambda:open_file(), font=fontBody, bg=bgButton, width=btnWidth)
+browse_text.set('Select File')
+select_file_btn.grid(columnspan=5, column=0, row=3)
 
 
 
-# ## Exit button
-# exit_btn = Button(window, text='EXIT', command=window.quit, font=fontBody, bg='#ff6459', width=btnWidth)
-# exit_btn.grid(column=0, row=2, padx=button_pad[0], pady=button_pad[1])
-# ## Print unique spending categories
-# def printCats():
-# 	a = function1()
-# 	global categories_list 
-# 	categories_list = Text(window, height=10, width=btnWidth, padx=15, pady=15, font=fontBody)
-# 	categories_list.insert(1.0, a)
-# 	# Center the text
-# 	categories_list.tag_configure('left', justify='left')
-# 	categories_list.tag_add('left', 1.0, 'end')
-# 	categories_list.grid(column=0, row=4)
-# # Label(frame1, text="Press this to print \nunique spending categories").grid(row=2, column=0)
-# btn1_1 = Button(window, text="Print unique spending categories", command=printCats, font=fontBody, bg=bgButton, width=btnWidth)
-# btn1_1.grid(row=3, column=0, padx=button_pad[0], pady=button_pad[1])
-
-# ## Print spending graphs
-# ## Print totals per month (all time)
-# btn3_1 = Button(window, text='Print totals per month (all time)', command=plot2_ver2, font=fontBody, bg=bgButton, width=btnWidth)
-# btn3_1.grid(column = 3, row=2, padx=button_pad[0], pady=button_pad[1])
-# ## Print totals per month (specified year)
-# e1 = Entry(window, width=20)
-# e1.grid(column=4, row=3)
-# btn3_2 = Button(window, text='Print totals per month (specified year)', command=lambda: plot3(e1.get()), font=fontBody, bg=bgButton, width=btnWidth); 
-# btn3_2.grid(column = 3, row=3, padx=button_pad[0], pady=button_pad[1])
-# Label(window, text='Example: 2021', font=fontBody, bg=bg1).grid(column=5, row=3)
-# ## Print totals per month in the specified range
-# Label(window, text='Example: \n2021.09', font=fontBody, bg=bg1).grid(column=5, row=4)
-# Label(window, text='Example: \n2021.12', font=fontBody, bg=bg1).grid(column=5, row=5)
-# # Label(window, text='From', font=fontBody, bg=bg1).grid(row=5, column=1)
-# # Label(window, text='-', font=fontBody, bg=bg1).grid(row=5, column=2)
-# # Label(window, text='To', font=fontBody, bg=bg1).grid(row=5, column=2)
-# e2 = Entry(window); e2.grid( column=4, row=4)
-# e3 = Entry(window); e3.grid( column=4, row=5)
-# btn3_3 = Button(window, text='Print totals per month \nin the specified range', command=lambda: plot4(e2.get(), e3.get()), font=fontBody, bg=bgButton, width=btnWidth)
-# # btn3_3.grid(column=3, row=4, padx=button_pad[0], pady=button_pad[1])
-# btn3_3.place(x=320, y=350)
-
-
-# # Label(window, text='From', font=fontBody, bg=bg1).grid(row=4, column=1)
-# # e2 = Entry(window); e2.grid(row=4, column=2)
-# # Label(window, text='To', font=fontBody, bg=bg1).grid(row=5, column=1)
-# # e3 = Entry(window); e3.grid(row=5, column=2)
-# # btn3_3 = Button(window, text='Print totals per month \nin the specified range', command=lambda: plot4(e2.get(), e3.get()), font=fontBody, bg=bgButton, width=btnWidth); btn3_3.grid(row=4, column=0)
-
-
+Label(window, text="").grid(columnspan=5, column=0, row=5)
 
 
 window.mainloop()
