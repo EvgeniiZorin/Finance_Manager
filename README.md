@@ -1,4 +1,5 @@
 # Finance_Manager
+> ver3.2.1
 
 This python script reads "Finance_record.tsv" file with information on spendings by date and category, and creates visualisations on some parameters:
 - Show total spendings per month (all-time);
