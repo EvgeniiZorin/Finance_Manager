@@ -184,6 +184,9 @@ pad = [10, 10]
 button_pad = [5, 5]
 fontFrameTitle = 'Helvetica 10'
 
+s = ttk.Style()
+s.configure('User.TLabelFrame', bordercolor='white')
+
 # Logo
 logo = Image.open('dollar_house.png')
 logo = logo.resize((300, 205), Image.ANTIALIAS)
@@ -198,10 +201,14 @@ logo_label.grid(columnspan=5, column=0, row=0, pady=30)
 frame1 = Label(window, text="Welcome to the Finance Manager!\nHere, you can visualise your spendings in nice graphs!", font=fontTitle)
 frame1.grid(columnspan=5, column=0, row=1, padx=30)
 
+
 ## Select File Prompt
-def open_file():
-	browse_text.set('loading...')
-	file = askopenfilename(filetype=[("TSV file", "*.tsv")])
+def open_file(pre_selected_file):
+	if pre_selected_file == True:
+		file = 'C:/Users/evgen/Desktop/Python/Finance_manager/Finance_manager_v3.2.1/Finance_record.tsv'
+	else:
+		browse_text.set('loading...')
+		file = askopenfilename(filetype=[("TSV file", "*.tsv")])
 	if file:
 		window.geometry('1070x900')
 		Label(window, text=f"You have selected: {file}").grid(columnspan=5, column=0, row=4, pady=30)
@@ -210,8 +217,11 @@ def open_file():
 		browse_text.set('Select File')
 		### 
 		# FRAME 1
-		frame1 = LabelFrame(window, text="Information", padx=50, pady=50, font=fontFrameTitle)
+		# LabelFrame(window, text='4', padx=50, pady=10, font=fontFrameTitle, height=425, width=410).grid(column=0, row=5, padx=50)
+		Canvas(window, height=425, width=410).grid(column=0, row=5)
+		frame1 = LabelFrame(window, text="Information", padx=50, pady=10, font=fontFrameTitle)
 		frame1.grid(column=0, row=5, padx=50)
+		
 		## Print unique spending categories
 		def printCats():
 			a = function1(file)
@@ -224,7 +234,29 @@ def open_file():
 			categories_list.grid(column=0, row=2)
 		# Label(frame1, text="Press this to print \nunique spending categories").grid(row=2, column=0)
 		btn1_1 = Button(frame1, text="Print unique spending categories", command=printCats, font=fontBody, bg=bgButton, width=btnWidth)
-		btn1_1.grid(row=1, column=0, padx=button_pad[0], pady=button_pad[1])
+		btn1_1.grid(row=0, column=0, padx=button_pad[0], pady=button_pad[1])
+		# c1 = Text(frame1, height=10, width=btnWidth, padx=15, pady=15, font=fontBody)
+		# c1.grid(column=0, row=2)
+		## Print period for which finance data is available
+		def data_available():
+			dfHeader, dfMain = dataset_process_basic(file)
+			currency = 'MXN'; 
+			dfMain = convert(dfMain, currency)
+			dfMain2 = dfMain.groupby('Date')[f'Converted_{currency}'].sum().to_frame().reset_index()
+			dfMain2 = add_extra_dates(dfMain2)
+			print(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y'))
+			print(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))
+			a = f"Data is available from {str(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y'))} to {str(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))}"
+			# str(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y')) + ' ' + str(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))
+			text_available_dates = Text(frame1, height=2, width=btnWidth, padx=15, pady=15, font=fontBody, wrap=WORD)
+			text_available_dates.insert(1.0, a)
+			text_available_dates.tag_configure('left', justify='left')
+			text_available_dates.tag_add('left', 1.0, 'end')
+			text_available_dates.grid(column=0, row=4)
+		btn1_2 = Button(frame1, text='Print period for which \nfinance data is available', command=data_available, font=fontBody, bg=bgButton, width=btnWidth)
+		btn1_2.grid(row=3, column=0, padx=button_pad[0], pady=button_pad[1])
+		# c2 = Text(frame1, height=2, width=btnWidth, padx=15, pady=15, font=fontBody)
+		# c2.grid(column=0, row=4)
 
 		# FRAME 2
 		frame2 = LabelFrame(window, text="Graphs", padx=50, pady=50, font=fontFrameTitle)
@@ -262,10 +294,12 @@ exit_btn.grid(columnspan=5, column=0, row=2, padx=button_pad[0], pady=button_pad
 
 # SELECT FILE button
 browse_text = StringVar()
-select_file_btn = Button(window, textvariable=browse_text, command=lambda:open_file(), font=fontBody, bg=bgButton, width=btnWidth)
+select_file_btn = Button(window, textvariable=browse_text, command=lambda:open_file(False), font=fontBody, bg=bgButton, width=btnWidth)
 browse_text.set('Select File')
 select_file_btn.grid(columnspan=5, column=0, row=3)
 
+#### FOR TESTING ONLY
+# open_file(True)
 
 
 Label(window, text="").grid(columnspan=5, column=0, row=5)
