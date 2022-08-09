@@ -3,7 +3,7 @@
 
 This is a program for calculating spendings based on a financial record. It creates summarisation graphs on different parameters. 
 
-## INPUT
+## Input
 
 A spendings file containing spendings in the following format (columns separated by tabs, at the end of each line there is a newline):
 ```csv
@@ -11,7 +11,7 @@ Date	Category	Amount	Currency
 ```
 For the same month, the same categories can contain multiple recordings - these are summed up in the processing. For reference, please see `Finance_record.tsv`. 
 
-## HOW TO RUN
+## How to run
 
 To run the program, execute the main script `Main.py`. This open up a GUI, with which you then choose a finance record file of your choice and then can utilise the available functionality. 
 
@@ -21,7 +21,7 @@ pyinstaller -w Main.py
 ```
 I didn't include the `.exe` file because it is too large to store on the Github :(
 
-## FUNCTIONALITY
+## Functionality
 
 This python script reads a specified spendings file (for example, `Finance_record.tsv`) with information on spendings by date and category, and outputs some interesting information on the spendings:
 
