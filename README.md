@@ -6,7 +6,7 @@ This is a program for calculating spendings based on a financial record. It crea
 ## Input
 
 A spendings file containing spendings in the following format (columns separated by tabs, at the end of each line there is a newline):
-```csv
+```tsv
 Date	Category	Amount	Currency
 01.09.2021	groceries	100	MXN
 ```
