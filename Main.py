@@ -12,15 +12,8 @@ from tkinter.filedialog import askopenfilename
 
 
 ############################################################################
-#####   Backend   ##########################################################
+#####   Functions   ########################################################
 ############################################################################
-
-
-
-
-### Data processing functions
-############################################################################
-
 
 def dataset_process_basic(file_name):
 	"""
@@ -73,29 +66,63 @@ def add_extra_dates(dfMain):
 	dfMain['MMYY']   = dfMain['Date'].dt.strftime('%m.%y')
 	return dfMain
 
-### Data summarisation and visualisation
+
+############################################################################
+#####   Data Visualisation   ###############################################
 ############################################################################
 
-def function1(pathed_filename):
+"""
+Legend:
+---
+A = data summary
+B = data graphs and visualisations
+"""
+
+def unique_spending_categories(pathed_filename:str) -> list:
 	"""
-	Print unique counts of spending categories
+	Generic function. 
+
+	Returns a list of unique spendings categories. 
 	"""
 	dfHeader, df2 = dataset_process_basic(pathed_filename)
 	array = df2['Category'].unique()
-	textOutput = ''
-	textOutput += f"Spending categories:\n"
-	c=1; 
-	for i in array: textOutput += f"  {c}) {i}\n"; c+=1
-	return textOutput
+	return array
 
-def plot1():
+def A1_unique_spending_categories(file, frame1):
 	"""
-	Toy plot
+	Print unique spending categories
+	
+	This function activates upon pressing of a button, printing unique spending categories in the GUI field
 	"""
-	x = np.arange(0, 10+1, 1)
-	# axes.plot(x, x + 5)
-	graph1 = sns.regplot(x, x*2)
-	plt.show()
+	a_list = unique_spending_categories(file)
+	a = ''
+	a += "Spending categories:\n"
+	c = 1; 
+	for i in a_list: a += f"  {c}) {i}\n"; c+=1
+	#
+	global categories_list 
+	categories_list = Text(frame1, height=10, width=btnWidth, padx=15, pady=15, font=fontBody)
+	categories_list.insert(1.0, a)
+	# Center the text
+	categories_list.tag_configure('left', justify='left')
+	categories_list.tag_add('left', 1.0, 'end')
+	categories_list.grid(column=0, row=2)
+
+def A2_data_available(file, frame1):
+	dfHeader, dfMain = dataset_process_basic(file)
+	currency = 'MXN'; 
+	dfMain = convert(dfMain, currency)
+	dfMain2 = dfMain.groupby('Date')[f'Converted_{currency}'].sum().to_frame().reset_index()
+	dfMain2 = add_extra_dates(dfMain2)
+	print(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y'))
+	print(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))
+	a = f"Data is available from {str(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y'))} to {str(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))}"
+	# str(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y')) + ' ' + str(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))
+	text_available_dates = Text(frame1, height=2, width=btnWidth, padx=15, pady=15, font=fontBody, wrap=WORD)
+	text_available_dates.insert(1.0, a)
+	text_available_dates.tag_configure('left', justify='left')
+	text_available_dates.tag_add('left', 1.0, 'end')
+	text_available_dates.grid(column=0, row=4)
 
 def plot2(pathed_filename):
 	"""
@@ -114,7 +141,7 @@ def plot2(pathed_filename):
 	sns.set_context('poster')
 	plt.show()
 
-def plot2_ver2(pathed_filename):
+def B1_totals_allTime(pathed_filename):
 	dfHeader, dfMain = dataset_process_basic(pathed_filename)
 	currency = 'MXN'; 
 	dfMain = convert(dfMain, currency)
@@ -130,7 +157,7 @@ def plot2_ver2(pathed_filename):
 	sns.set_context('poster')
 	plt.show()
 
-def plot3(pathed_filename, year):
+def B2_totals_specificYear(pathed_filename, year):
 	dfHeader, dfMain = dataset_process_basic(pathed_filename)
 	currency = 'MXN'; 
 	dfMain = convert(dfMain, currency)
@@ -150,7 +177,7 @@ def plot3(pathed_filename, year):
 	plt.show()
 	# return df3
 
-def plot4(pathed_filename, startDate, endDate):
+def B3_totals_specificRange(pathed_filename, startDate, endDate):
 	"""
 	startDate = '2022.03'
 	endDate = '2022.05'
@@ -169,7 +196,15 @@ def plot4(pathed_filename, startDate, endDate):
 	plt.legend([], [], frameon=False)
 	plt.show()
 
-def plot15(pathed_filename, startDate, endDate, category):
+
+def dropdown(file, dropdown, entry1, entry2):
+	# print('welp')
+	# print(clicked.get())
+	print(dropdown, entry1, entry2)
+	B4_totals_specificRange_specificCategory(file, entry1, entry2, dropdown)
+
+
+def B4_totals_specificRange_specificCategory(pathed_filename, startDate, endDate, category):
 	dfHeader, dfMain = dataset_process_basic(pathed_filename)
 	currency = 'MXN'; 
 	dfMain = convert(dfMain, currency)
@@ -186,13 +221,15 @@ def plot15(pathed_filename, startDate, endDate, category):
 	plt.legend([], [], frameon=False)
 	plt.show()
 
-###########################
 
-version = '3.3.1'
+############################################################################
+#####   GUI   ##############################################################
+############################################################################
+
+version = '3.3.2'
 
 window = Tk()
 window.title(f'Finance manager ver {version}')
-# window.geometry('1140x900')
 
 # Aesthetics
 bg1 = 'lightgrey'
@@ -212,7 +249,7 @@ s.configure('User.TLabelFrame', bordercolor='white')
 
 # Logo
 logo = Image.open('dollar_house.png')
-logo = logo.resize((300, 205), Image.ANTIALIAS)
+logo = logo.resize((250, 155), Image.ANTIALIAS)
 logo = ImageTk.PhotoImage(logo)
 logo_label = Label(image=logo)
 logo_label.image = logo
@@ -220,7 +257,7 @@ logo_label.grid(columnspan=5, column=0, row=0, pady=30)
 
 
 
-## Description
+## Main Menu with description
 frame1 = Label(window, text="Welcome to the Finance Manager!\nHere, you can visualise your spendings in nice graphs!", font=fontTitle)
 frame1.grid(columnspan=5, column=0, row=1, padx=30)
 
@@ -236,98 +273,67 @@ def open_file(pre_selected_file):
 		file = askopenfilename(filetype=[("TSV file", "*.tsv")])
 	if file:
 		window.geometry('1070x900')
-		Label(window, text=f"You have selected: {file}").grid(columnspan=5, column=0, row=4, pady=30)
+		Label(window, text=f"You have selected: {file}").grid(columnspan=5, column=0, row=4, pady=15)
 		print(file)
 		# Got the filename, now can put it to all the functions
 		browse_text.set('Select File')
 		### 
 		# FRAME 1
-		# LabelFrame(window, text='4', padx=50, pady=10, font=fontFrameTitle, height=425, width=410).grid(column=0, row=5, padx=50)
 		Canvas(window, height=425, width=410).grid(column=0, row=5)
 		frame1 = LabelFrame(window, text="Information", padx=50, pady=10, font=fontFrameTitle)
 		frame1.grid(column=0, row=5, padx=50)
-		
-		## Print unique spending categories
-		def printCats():
-			a = function1(file)
-			global categories_list 
-			categories_list = Text(frame1, height=10, width=btnWidth, padx=15, pady=15, font=fontBody)
-			categories_list.insert(1.0, a)
-			# Center the text
-			categories_list.tag_configure('left', justify='left')
-			categories_list.tag_add('left', 1.0, 'end')
-			categories_list.grid(column=0, row=2)
-		# Label(frame1, text="Press this to print \nunique spending categories").grid(row=2, column=0)
-		btn1_1 = Button(frame1, text="Print unique spending categories", command=printCats, font=fontBody, bg=bgButton, width=btnWidth)
+		##############################################################
+		#####   A1: Print unique spending categories   ###############
+		##############################################################
+		btn1_1 = Button(frame1, text="Print unique spending categories", command=lambda: A1_unique_spending_categories(file, frame1), font=fontBody, bg=bgButton, width=btnWidth)
 		btn1_1.grid(row=0, column=0, padx=button_pad[0], pady=button_pad[1])
-		# c1 = Text(frame1, height=10, width=btnWidth, padx=15, pady=15, font=fontBody)
-		# c1.grid(column=0, row=2)
-		## Print period for which finance data is available
-		def data_available():
-			dfHeader, dfMain = dataset_process_basic(file)
-			currency = 'MXN'; 
-			dfMain = convert(dfMain, currency)
-			dfMain2 = dfMain.groupby('Date')[f'Converted_{currency}'].sum().to_frame().reset_index()
-			dfMain2 = add_extra_dates(dfMain2)
-			print(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y'))
-			print(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))
-			a = f"Data is available from {str(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y'))} to {str(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))}"
-			# str(dfMain2['Date'].min().to_pydatetime().strftime('%d.%m.%Y')) + ' ' + str(dfMain2['Date'].max().to_pydatetime().strftime('%d.%m.%Y'))
-			text_available_dates = Text(frame1, height=2, width=btnWidth, padx=15, pady=15, font=fontBody, wrap=WORD)
-			text_available_dates.insert(1.0, a)
-			text_available_dates.tag_configure('left', justify='left')
-			text_available_dates.tag_add('left', 1.0, 'end')
-			text_available_dates.grid(column=0, row=4)
-		btn1_2 = Button(frame1, text='Print period for which \nfinance data is available', command=data_available, font=fontBody, bg=bgButton, width=btnWidth)
+		##############################################################################
+		#####   A2: Print period for which finance data is available   ###############
+		##############################################################################
+		btn1_2 = Button(frame1, text='Print period for which \nfinance data is available', command=lambda: A2_data_available(file, frame1), font=fontBody, bg=bgButton, width=btnWidth)
 		btn1_2.grid(row=3, column=0, padx=button_pad[0], pady=button_pad[1])
 		# c2 = Text(frame1, height=2, width=btnWidth, padx=15, pady=15, font=fontBody)
 		# c2.grid(column=0, row=4)
-
 		# FRAME 2
 		frame2 = LabelFrame(window, text="Graphs", padx=50, pady=50, font=fontFrameTitle)
 		frame2.grid(column=1, row=5)
-
-		## Print totals per month (all time)
+		##############################################################
+		#####   B1: Print totals per month (all time)   ##############
+		##############################################################
 		Label(frame2, text='Print totals per month (all time)', font='Helvetica 15 bold').grid(columnspan=4, column=0, row=0, pady=button_pad[1])
-		btn3_1 = Button(frame2, text='RUN', command=lambda: plot2_ver2(file), font=fontBody, bg=bgButton, width=btnWidth)
-		# btn3_1.grid(column = 0, row=1, padx=button_pad[0], pady=button_pad[1])
+		btn3_1 = Button(frame2, text='RUN', command=lambda: B1_totals_allTime(file), font=fontBody, bg=bgButton, width=btnWidth)
 		btn3_1.grid(columnspan=4, column=0, row=1)
-		## Print totals per month (specified year)
+		####################################################################
+		#####   B2: Print totals per month (specified year)   ##############
+		####################################################################
 		Label(frame2, text='Print totals per month (specified year)', font='Helvetica 15 bold').grid(columnspan=4, column=0, row=2, pady=button_pad[1])
 		e1 = Entry(frame2, width=btnWidth)
 		e1.grid(columnspan=4, column=0, row=3, padx=button_pad[0], pady=button_pad[1])
-		btn3_2 = Button(frame2, text='RUN', command=lambda: plot3(file, e1.get()), font=fontBody, bg=bgButton); 
+		btn3_2 = Button(frame2, text='RUN', command=lambda: B2_totals_specificYear(file, e1.get()), font=fontBody, bg=bgButton); 
 		btn3_2.grid(column = 3, row=3, padx=button_pad[0], pady=button_pad[1])
-		## Print totals per month (specified range)
+		####################################################################
+		#####   B3: Print totals per month (specified range)   #############
+		####################################################################
 		Label(frame2, text='Print totals per month in the specified range', font='Helvetica 15 bold').grid(columnspan=4, column=0, row=4, pady=button_pad[1])
 		Label(frame2, text='Example: 2021.09 - 2021.12').grid(columnspan=4, column=0, row=5)
 		x1=50; y1=220
 		e2 = Entry(frame2); e2.place(x=x1, y=y1)
 		Label(frame2, text='-').place(x=x1+130, y=y1)
 		e3 = Entry(frame2); e3.place(x=x1+150, y=y1)
-		# Label(frame2, text='-').grid(column=1, row=6)
-		# e3 = Entry(frame2); e3.grid( column=1, row=6)
-		btn3_3 = Button(frame2, text='RUN', command=lambda: plot4(file, e2.get(), e3.get()), font=fontBody, bg=bgButton)
-		# btn3_3.grid(column=3, row=4, padx=button_pad[0], pady=button_pad[1])
-		# btn3_3.grid(column=3, row=6)
+		btn3_3 = Button(frame2, text='RUN', command=lambda: B3_totals_specificRange(file, e2.get(), e3.get()), font=fontBody, bg=bgButton)
 		btn3_3.place(x=x1+290, y=y1-6)
-		#
-		### Print totals per month for a chosen category, for a specified range
-		def dropdown(dropdown, entry1, entry2):
-			# print('welp')
-			# print(clicked.get())
-			print(dropdown, entry1, entry2)
-			plot15(file, entry1, entry2, dropdown)
+		################################################################################################
+		#####   B4: Print totals per month for a chosen category, for a specified range   ##############
+		################################################################################################
 		Label(frame2, text='').grid(column=10, row=6)
-		Label(frame2, text='Print totals per month for a chosen category').grid(columnspan=4, column=0, row=7, pady=button_pad[1])
-		categories = function1(file); categories1 = [ i[5:].strip() for i in categories.split('\n')[1:] if i != '']
-		print(categories1)
+		Label(frame2, text='Print totals per month for a chosen category', font='Helvetica 15 bold').grid(columnspan=4, column=0, row=7, pady=button_pad[1]+20)
+		categories1 = unique_spending_categories(file)
 		clicked = StringVar()
 		clicked.set(categories1[0])
-		drop = OptionMenu(frame2, clicked, *categories1).grid(column=0, row=8)
-		e2_4_a = Entry(frame2); e2_4_a.grid(column=1, row=8)
-		e2_4_b = Entry(frame2); e2_4_b.grid(column=2, row=8)
-		btn3_4 = Button(frame2, text='RUN', command=lambda: dropdown(clicked.get(), e2_4_a.get(), e2_4_b.get()), font=fontBody).grid(column=0, row=9)
+		drop = OptionMenu(frame2, clicked, *categories1).place(x=x1-80, y=y1+90)
+		e2_4_a = Entry(frame2); e2_4_a.place(x=x1+100, y=y1+95, width=80)
+		e2_4_b = Entry(frame2); e2_4_b.place(x=x1+200, y=y1+95, width=80)
+		btn3_4 = Button(frame2, text='RUN', command=lambda: dropdown(file, clicked.get(), e2_4_a.get(), e2_4_b.get()), font=fontBody, bg=bgButton).place(x=x1+300, y=y1+90)
 
 
 
@@ -342,13 +348,13 @@ select_file_btn = Button(window, textvariable=browse_text, command=lambda:open_f
 browse_text.set('Select File')
 select_file_btn.grid(columnspan=5, column=0, row=3)
 
-### FOR TESTING ONLY
+# ## FOR TESTING ONLY
 # open_file(True)
 
 
 Label(window, text="").grid(columnspan=5, column=0, row=5)
 
-
+# End the script
 window.mainloop()
 
 # Ways to place content onto the main canvas

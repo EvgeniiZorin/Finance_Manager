@@ -1,5 +1,5 @@
 # Finance_Manager
-> ver 3.3.1
+> ver 3.3.2
 
 This is a program for calculating spendings based on a financial record. It creates summarisation graphs on different parameters. 
 
@@ -8,6 +8,7 @@ This is a program for calculating spendings based on a financial record. It crea
 A spendings file containing spendings in the following format (columns separated by tabs, at the end of each line there is a newline):
 ```csv
 Date	Category	Amount	Currency
+01.09.2021	groceries	100	MXN
 ```
 For the same month, the same categories can contain multiple recordings - these are summed up in the processing. For reference, please see `Finance_record.tsv`. 
 
