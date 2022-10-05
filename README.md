@@ -3,6 +3,10 @@
 
 This is a program for calculating spendings based on a financial record. It creates summarisation graphs on different parameters. 
 
+https://youtu.be/WE1XGUu19EM
+
+[![Everything Is AWESOME](https://img.youtube.com/vi/StTqXEQ2l-Y/0.jpg)](https://www.youtube.com/watch?v=StTqXEQ2l-Y "Everything Is AWESOME")
+
 ## Input
 
 A spendings file containing spendings in the following format (columns separated by tabs, at the end of each line there is a newline):
