@@ -3,7 +3,7 @@
 
 This is a program for calculating spendings based on a financial record. It creates summarisation graphs on different parameters. 
 
-<img align="center" alt="Python" width="500px" src="https://github.com/EvgeniiZorin/Finance_Manager/blob/4e84b908a629222a0b3052c9d5ab64f5c574e43e/Finance_manager_demo.png"/>
+<!-- <img align="center" alt="Python" width="500px" src="https://github.com/EvgeniiZorin/Finance_Manager/blob/4e84b908a629222a0b3052c9d5ab64f5c574e43e/Finance_manager_demo.png"/> -->
 
 ![image alt text](https://github.com/EvgeniiZorin/Finance_Manager/blob/4e84b908a629222a0b3052c9d5ab64f5c574e43e/Finance_manager_demo.png)
 
