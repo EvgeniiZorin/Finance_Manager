@@ -3,13 +3,12 @@
 
 This is a program for calculating spendings based on a financial record. It creates summarisation graphs on different parameters. 
 
-![image alt text](https://example.com/link-to-image)
+![image alt text](https://github.com/EvgeniiZorin/Finance_Manager/blob/4e84b908a629222a0b3052c9d5ab64f5c574e43e/Finance_manager_demo.png)
 
 You can view the application demo via the link below:
 
 https://youtu.be/WE1XGUu19EM
 
-[![Everything Is AWESOME](https://img.youtube.com/vi/StTqXEQ2l-Y/0.jpg)](https://www.youtube.com/watch?v=StTqXEQ2l-Y "Everything Is AWESOME")
 
 ## Input
 
