@@ -1,5 +1,5 @@
 # Finance_Manager
-> ver 3.3.2
+> ver 4.0.0
 
 This is a program for calculating spendings based on a financial record. It creates summarisation graphs on different parameters. 
 
