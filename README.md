@@ -9,7 +9,7 @@ This is a program for calculating spendings based on a financial record. It crea
 
 You can view the application demo via the link below:
 
-https://youtu.be/w6Fj2v4vIAE
+https://youtu.be/lKnAIG7QHhI
 
 
 ## Input
